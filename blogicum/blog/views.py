@@ -1,4 +1,7 @@
+from django.http import Http404
+
 from django.shortcuts import render
+
 
 posts = [
     {
@@ -43,6 +46,8 @@ posts = [
     },
 ]
 
+POSTS_WITH_ID = {post['id']: post for post in posts}
+
 
 def index(request):
     """Отображает главную страницу со списком публикаций."""
@@ -51,8 +56,9 @@ def index(request):
 
 def post_detail(request, id):
     """Отображает страницу отдельной публикации."""
-    post = next((post_item for post_item in posts if post_item['id'] == id),
-                None)
+    post = POSTS_WITH_ID.get(id)
+    if post is None:
+        raise Http404("Пост не найден")
     return render(request, 'blog/detail.html', {'post': post})
 
 
